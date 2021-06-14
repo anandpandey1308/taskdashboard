@@ -45,7 +45,7 @@ router.put('/:id', async (req,res)=>{
     const isCompleted = req.body.isCompleted;
     
     taskController.set(taskId, name, isCompleted).then((response)=>{
-        res.json({status:true, tasks:response});
+        res.json({status:true, task:response});
     }).catch(()=>{
         res.json({status:false, message:"Unable to set task"});
     });

@@ -27,57 +27,42 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function TasksList({dashboardData, removeFromTaskList}) {
+export default function TasksList({dashboardData, removeFromTaskList, editFromList, editFromListC}) {
   const classes = useStyles();
 
-  const [checked, setChecked] = React.useState([0]);
   const [tasksList, setTasks] = React.useState(dashboardData.latestTasks);
-  console.log(dashboardData)
+  
   const [editTask, setEditTask] = React.useState(null);
-
-  const handleToggle = (value) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    setChecked(newChecked);
-  };
 
   const removeTask = async (taskId)=>{
       await tasksController.removeTask(taskId);
       removeFromTaskList(taskId);
   }
 
-  const editATask = (e, taskId)=>{
-    tasksController.editTask(taskId, null, e.target.checked);
-    console.log(e.target.isChecked)
+  const editATask = async (taskId, completed)=>{
+    console.log(taskId, completed);
+    tasksController.editTask(taskId, null, !completed);
+    editFromListC(taskId, !completed);
   }
 
   return (
     <>
-    {editTask != null && <EditTask taskId={editTask} setEditTask={setEditTask} />}
+    {editTask != null && <EditTask taskId={editTask} setEditTask={setEditTask} editFromList={editFromList} />}
     <Card className={classes.root}>
       <CardContent className={classes.cardContent}>
         <List className={classes.root}>
           {tasksList.map((task, i) => {
               
             const taskId = task["_id"];
-
             return (
                 <div key={taskId}>
-                <ListItem key={taskId} role={undefined} dense button onClick={handleToggle(taskId)} className={classes.listItem}>
+                <ListItem key={taskId} role={undefined} dense button onClick={()=>{editATask(taskId, task.completed)}} className={classes.listItem}>
                     <ListItemIcon>
                     <Checkbox
-                        edge="start"
-                        checked={checked.indexOf(taskId) !== -1 || task.completed}
-                        tabIndex={-1}
-                        disableRipple
-                        onChange={(e)=>{editATask(e,taskId)}}
+                      edge="start"
+                      checked={ task.completed }
+                      tabIndex={-1}
+                      disableRipple
                     />
                     </ListItemIcon>
                     <ListItemText id={taskId} primary={task.name} />

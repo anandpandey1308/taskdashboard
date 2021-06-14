@@ -43,15 +43,16 @@ const useStyles = makeStyles({
     }
   });
 
-export default function EditTask({taskId, setEditTask=()=>{}}) {
+export default function EditTask({taskId, setEditTask=()=>{}, editFromList}) {
     const classes = useStyles();
 
     const [taskName, setTaskName] = React.useState("");
 
     const editTask = async(e)=>{
         if(taskName !== ""){
-            await tasksController.editTask(taskId, taskName);
+            const response = await tasksController.editTask(taskId, taskName);
             setEditTask(null);
+            editFromList(response.task);
         }
     }
 

@@ -35,7 +35,7 @@ const set = async (taskId, name, isCompleted)=>{
     const toUpdate = {}
     
     if(name) toUpdate.name = name;
-    if(isCompleted) toUpdate.completed = isCompleted;
+    if(isCompleted != null || isCompleted != undefined) toUpdate.completed = isCompleted;
 
     return await Task.findByIdAndUpdate(mongoose.Types.ObjectId(taskId), toUpdate, {
         new: true

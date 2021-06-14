@@ -17,12 +17,6 @@ import PlusIcon from '@material-ui/icons/Add';
 import List from '../components/List';
 import AddTask from '../components/AddTask';
 
-function useForceUpdate(){
-  const [value, setValue] = useState(0);
-  console.log("something")
-  return () => setValue(value => value+1);
-}
-
 const useStyles = makeStyles((theme) => ({
   flex:{
       display:"flex",
@@ -64,7 +58,6 @@ function DashBoard() {
   const [updated, setUpdated] = useState(false);
   const [newTask, setNewTask] = React.useState(false);
 
-  const forceUpdate = useForceUpdate();
 
   useEffect( () => {
 
@@ -80,14 +73,17 @@ function DashBoard() {
   }, [updated]);
 
   const addToTaskList = (newTask)=>{
+    setDashboardData(null)
     setDashboardData({
       taskCompleted: dashboardData.taskCompleted + 1,
       totalTask: dashboardData.totalTask + 1,
-      latestTasks: [...dashboardData.latestTasks, newTask]
+      latestTasks: [...dashboardData.latestTasks, newTask.task]
     });
+
+    console.log("adding", newTask)
+
     setHaveAnyTask(true);
     setUpdated(true);
-    forceUpdate();
   }
 
   const removeFromTaskList = (taskId)=>{
@@ -98,19 +94,56 @@ function DashBoard() {
     }
 
     console.log(dashboardData.latestTasks, newTasksList)
+    setDashboardData(null)
     setDashboardData({
       taskCompleted: dashboardData.taskCompleted ,
       totalTask: dashboardData.totalTask - 1,
       latestTasks: newTasksList
     });
     setUpdated(true);
-    forceUpdate();
   }
 
   const setNewTaskAndAdd = (task)=>{
     setNewTask(false);
     addToTaskList(task);
     setHaveAnyTask(true);
+  }
+
+  const editFromList = (editedTask)=>{
+    const newTasksList = [];
+    for (let index = 0; index < dashboardData.latestTasks.length; index++) {
+      const task = dashboardData.latestTasks[index];
+      if(task["_id"] != editedTask["_id"]) newTasksList.push(task) 
+      else newTasksList.push(editedTask);
+    }
+
+    setDashboardData(null)
+    setDashboardData({
+      taskCompleted: dashboardData.taskCompleted ,
+      totalTask: dashboardData.totalTask - 1,
+      latestTasks: newTasksList
+    });
+    setUpdated(true);
+  }
+
+  const editFromListC = (taskId, completed)=>{
+    const newTasksList = [];
+    for (let index = 0; index < dashboardData.latestTasks.length; index++) {
+      const task = dashboardData.latestTasks[index];
+      if(task["_id"] != taskId) newTasksList.push(task) 
+      else {
+        task["completed"] = completed;
+        newTasksList.push(task);
+      };
+    }
+
+    setDashboardData(null)
+    setDashboardData({
+      taskCompleted: dashboardData.taskCompleted ,
+      totalTask: dashboardData.totalTask - 1,
+      latestTasks: newTasksList
+    });
+    setUpdated(true);
   }
 
     return (
@@ -136,10 +169,10 @@ function DashBoard() {
                         </Button>
                     </div>
                 </div>
-                <List dashboardData={dashboardData} removeFromTaskList={removeFromTaskList} />
+                <List dashboardData={dashboardData} removeFromTaskList={removeFromTaskList} editFromList={editFromList} editFromListC={editFromListC} />
             </div>
             :
-            <NoTask taskHandler={addToTaskList} />
+            <NoTask addToTaskList={addToTaskList} />
         }
       </div>
     );

@@ -30,12 +30,12 @@ const useStyles = makeStyles({
     }
   });
 
-export default function NoTask({addTaskToList}) {
+export default function NoTask({addToTaskList}) {
     const classes = useStyles();
     const [adding, setAdding] = React.useState(false);
 
     const setNewTask =(task)=>{
-        addTaskToList(task);
+        addToTaskList(task);
         setAdding(false);
     }
     
